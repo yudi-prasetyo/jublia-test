@@ -99,7 +99,7 @@ docker-compose exec flask flask db upgrade
 - **event_id**: (integer, required) The ID of the event.
 - **email_subject**: (string, required) The subject of the email.
 - **email_content**: (string, required) The body content of the email.
-- **timestamp**: (ISO 8601 datetime string, required) The scheduled time for the email to be sent.
+- **timestamp**: (ISO 8601 datetime string, required) The scheduled time for the email to be sent. (Time in UTC+8)
 
 **Example Request**:
 
