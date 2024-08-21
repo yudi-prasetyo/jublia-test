@@ -1,26 +1,23 @@
 # Dockerfile
+FROM python:3.9-slim
 
-# Use the official Python image as the base image
-FROM python:3.11-slim
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Set the working directory in the container
+# Set work directory
 WORKDIR /app
 
-# Copy the requirements file into the container
+# Install dependencies
 COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Install any dependencies specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application code into the container
+# Copy project files
 COPY . .
 
-# Expose port 5000 to the outside world
+# Expose the port for Flask
 EXPOSE 5000
 
-# Set environment variables (adjust according to your configuration)
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=development
-
-# Run the migration and then start the application
-CMD ["sh", "-c", "flask db upgrade && flask run --host=0.0.0.0"]
+# Set the entry point for the Flask application
+CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]

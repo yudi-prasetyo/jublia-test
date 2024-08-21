@@ -1,23 +1,36 @@
+# app/__init__.py
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from config import Config
-from .celery_app import init_celery, celery
-from app.tasks import send_email_task
+from celery import Celery
 
 db = SQLAlchemy()
-migrate = Migrate()
 
-def create_app():
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        backend=app.config['CELERY_RESULT_BACKEND'],
+        broker=app.config['CELERY_BROKER_URL']
+    )
+    celery.conf.update(app.config)
+    return celery
+
+def create_app(config_class=Config):
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config_class)
+    app.config.update(
+        CELERY_BROKER_URL='redis://redis:6379/0',
+        CELERY_RESULT_BACKEND='redis://redis:6379/0'
+    )
+
+    celery = make_celery(app)
 
     db.init_app(app)
-    migrate.init_app(app, db)
 
-    # init_celery(app)  # Initialize Celery with the Flask app context
+    # from app.celery_app import make_celery
+    # celery = make_celery(app)
 
-    from app.routes import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+    from app.routes import main
+    app.register_blueprint(main)
 
     return app

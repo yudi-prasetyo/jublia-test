@@ -3,10 +3,62 @@ version: '3.8'
 services:
   flask:
     build: .
+    command: flask run --host=0.0.0.0 --port=5000
+    volumes:
+      - .:/app
     ports:
       - "5000:5000"
     environment:
-      - FLASK_APP=app.py
       - FLASK_ENV=development
+      - FLASK_APP=app
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgre
+      - DATABASE_HOST=host.docker.internal
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=postgres
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+
+  celery-worker:
+    build: .
+    command: celery -A celery_worker worker --loglevel=info
     volumes:
       - .:/app
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgre
+      - DATABASE_HOST=host.docker.internal
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=postgres
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+
+  celery-beat:
+    build: .
+    command: celery -A celery_worker beat --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgre
+      - DATABASE_HOST=host.docker.internal
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=postgres
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - celery-worker
+
+  redis:
+    image: redis:6.0-alpine
+    ports:
+      - "6379:6379"

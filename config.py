@@ -1,3 +1,4 @@
+# config.py
 from dotenv import load_dotenv
 import os
 
@@ -15,5 +16,5 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Celery Configuration
-    CELERY_BROKER_URL = f'redis://{REDIS_HOST}:6379/0'
-    CELERY_RESULT_BACKEND = f'redis://{REDIS_HOST}:6379/0'
+    CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+    CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
