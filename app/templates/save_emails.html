@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue an Email</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Queue an Email</h1>
+    <form id="save-email-form">
+        <label for="event_id">Event ID:</label>
+        <input type="number" id="event_id" name="event_id" required><br>
+
+        <label for="email_subject">Email Subject:</label>
+        <input type="text" id="email_subject" name="email_subject" required><br>
+
+        <label for="email_content">Email Content:</label>
+        <textarea id="email_content" name="email_content" required></textarea><br>
+
+        <label for="timestamp">Timestamp (ISO 8601 format):</label>
+        <input type="datetime-local" id="timestamp" name="timestamp" required><br>
+
+        <button type="submit">Queue Email</button>
+    </form>
+    <p id="response-message"></p>
+
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

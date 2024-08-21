@@ -8,23 +8,25 @@ This is a simple Flask application integrated with a PostgreSQL database. The ap
 jublia-test/
 │
 ├── app/
-│   ├── __init__.py           # Application factory and app setup
-│   ├── models.py             # SQLAlchemy models
-│   └── routes.py             # Routes and view functions
-│
-├── app.py                    # Main entry point of the application
-│
-├── celery_config.py          # Celery configuration file
-│
-├── celery_worker.py          # Celery worker script for scheduling emails
-│
-├── config.py                 # Configuration file
-│
-├── docker-compose.yaml       # Docker Compose configuration file
-│
-├── Dockerfile                # Dockerfile
-│
-└──requirements.txt          # Python requirements
+│   └── static/                 # CSS and JavaScript files
+│   │   ├── css/
+│   │   │   └── styles.css
+│   │   └── js/
+│   │       └── scripts.js
+│   ├── templates/              # HTML templates
+│   │   ├── index.html
+│   │   ├── save_emails.html
+│   │   └── add_recipient.html
+│   ├── __init__.py             # Application factory and app setup
+│   ├── models.py               # SQLAlchemy models
+│   └── routes.py               # Routes and view functions
+├── app.py                      # Main entry point of the application
+├── celery_config.py            # Celery configuration file
+├── celery_worker.py            # Celery worker script for scheduling emails
+├── config.py                   # Configuration file
+├── docker-compose.yaml         # Docker Compose configuration file
+├── Dockerfile                  # Dockerfile
+└──requirements.txt             # Python requirements
 ```
 
 ## Requirements
@@ -87,12 +89,14 @@ docker-compose exec flask flask db upgrade
 
 ```json
 {
+  "event_id": 1,
   "email_subject": "Your Subject Here",
   "email_content": "This is the content of the email.",
   "timestamp": "2024-08-21T12:30:00"
 }
 ```
 
+- **event_id**: (integer, required) The ID of the event.
 - **email_subject**: (string, required) The subject of the email.
 - **email_content**: (string, required) The body content of the email.
 - **timestamp**: (ISO 8601 datetime string, required) The scheduled time for the email to be sent.
@@ -103,6 +107,7 @@ docker-compose exec flask flask db upgrade
 curl -X POST http://localhost:5000/save_emails \
 -H "Content-Type: application/json" \
 -d '{
+  "event_id": 1,
   "email_subject": "Weekly Update",
   "email_content": "Here is your weekly update...",
   "timestamp": "2024-08-21T12:30:00"
@@ -126,8 +131,6 @@ curl -X POST http://localhost:5000/save_emails \
   "error": "Invalid timestamp format! Please use ISO 8601 format."
 }
 ```
-
----
 
 ### 2. **Add an Email Recipient**
 
@@ -167,6 +170,35 @@ curl -X POST http://localhost:5000/email-recipients \
   "message": "Recipient added successfully!"
 }
 ```
+
+---
+## Accessing the GUI
+
+This application includes a simple GUI built using HTML, CSS, and JavaScript, which allows users to interact with the API through a web interface.
+
+### Accessing the GUI
+
+You can access the GUI by navigating to `http://localhost:5000` in your web browser. The home page provides links to different functionalities of the application.
+
+### Queue an Email via GUI
+
+1. **Navigate to**: `http://localhost:5000/save_emails_page`.
+2. **Fill out the form** with the following details:
+   - **Event ID**: The ID of the event.
+   - **Email Subject**: The subject of the email.
+   - **Email Content**: The body of the email.
+   - **Timestamp**: The time when the email should be queued (use the ISO 8601 format).
+3. **Submit the form** to queue the email.
+
+### Add a Recipient via GUI
+
+1. **Navigate to**: `http://localhost:5000/add_recipient_page`.
+2. **Fill out the form** with the following details:
+   - **Email Address**: The email address of the recipient.
+   - **Full Name**: The full name of the recipient.
+3. **Submit the form** to add the recipient to the database.
+
+---
 
 ## Project Dependencies
 - Flask
