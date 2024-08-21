@@ -95,3 +95,7 @@ dmypy.json
 
 # Sphinx documentation
 docs/_build/
+
+dump.rdb
+
+celerybeat*
