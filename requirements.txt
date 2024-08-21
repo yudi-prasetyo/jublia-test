@@ -5,3 +5,5 @@ Flask-Migrate
 python-dotenv
 celery
 redis
+pytz
+mailjet_rest

@@ -8,16 +8,8 @@ services:
       - .:/app
     ports:
       - "5000:5000"
-    environment:
-      - FLASK_ENV=development
-      - FLASK_APP=app
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgre
-      - DATABASE_HOST=host.docker.internal
-      - DATABASE_PORT=5432
-      - DATABASE_NAME=postgres
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    env_file:
+      - .env
     depends_on:
       - redis
 
@@ -26,37 +18,10 @@ services:
     command: celery -A celery_worker worker --loglevel=info
     volumes:
       - .:/app
-    environment:
-      - FLASK_ENV=development
-      - FLASK_APP=app
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgre
-      - DATABASE_HOST=host.docker.internal
-      - DATABASE_PORT=5432
-      - DATABASE_NAME=postgres
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    env_file:
+      - .env
     depends_on:
       - redis
-
-  celery-beat:
-    build: .
-    command: celery -A celery_worker beat --loglevel=info
-    volumes:
-      - .:/app
-    environment:
-      - FLASK_ENV=development
-      - FLASK_APP=app
-      - DATABASE_USER=postgres
-      - DATABASE_PASSWORD=postgre
-      - DATABASE_HOST=host.docker.internal
-      - DATABASE_PORT=5432
-      - DATABASE_NAME=postgres
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-    depends_on:
-      - redis
-      - celery-worker
 
   redis:
     image: redis:6.0-alpine

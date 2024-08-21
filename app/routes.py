@@ -4,6 +4,7 @@ from app import db
 from app.models import EmailQueue, EmailRecipient
 from datetime import datetime
 from celery_worker import schedule_email
+import pytz
 
 main = Blueprint('main', __name__)
 
@@ -15,6 +16,7 @@ def index():
 def save_emails():
     data = request.get_json()
 
+    event_id = data.get('event_id')
     email_subject = data.get('email_subject')
     email_content = data.get('email_content')
     timestamp_str = data.get('timestamp')
@@ -25,15 +27,20 @@ def save_emails():
         return jsonify({'error': 'Invalid timestamp format! Please use ISO 8601 format.'}), 400
 
     new_email = EmailQueue(
+        event_id=event_id,
         email_subject=email_subject,
         email_content=email_content,
         timestamp=timestamp
     )
 
-    delay_seconds = (timestamp - datetime.now()).total_seconds()
-    print(delay_seconds)
+    recipients = EmailRecipient.query.all()
+    r = [recipient.as_dict() for recipient in recipients]
 
-    schedule_email.apply_async(countdown=delay_seconds)
+    utc8 = pytz.timezone('Asia/Singapore')
+    timestamp = utc8.localize(timestamp)
+    delay_seconds = (timestamp - datetime.now(utc8)).total_seconds()
+
+    schedule_email.apply_async((email_subject, email_content, r), countdown=delay_seconds)
 
     db.session.add(new_email)
     db.session.commit()
